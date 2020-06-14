@@ -1,0 +1,6 @@
+PIPENV_VENV_IN_PROJECT/
+.idea/
+.env
+*.db
+
+!.gitkeep

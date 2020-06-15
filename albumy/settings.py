@@ -23,6 +23,12 @@ else:
     prefix = 'sqlite:////'
 
 
+class Operations:
+    CONFIRM = 'confirm'
+    RESET_PASSWORD = 'reset-password'
+    CHANGE_EMAIL = 'change-email'
+
+
 class BaseConfig:
     SECRET_KEY = os.getenv('SECRET_KEY', 'secret string')
 
@@ -35,6 +41,8 @@ class BaseConfig:
     MAIL_USERNAME = os.getenv('MAIL_USERNAME')
     MAIL_PASSWORD = os.getenv('MAIL_PASSWORD')
     MAIL_DEFAULT_SENDER = ('Albumy', MAIL_USERNAME)
+
+    ALLOWED_IMAGE_EXTENSIONS = ['png', 'jpg', 'jpeg', 'gif']
 
 
 class DevelopmentConfig(BaseConfig):

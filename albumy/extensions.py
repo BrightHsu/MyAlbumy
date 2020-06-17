@@ -28,4 +28,12 @@ login_manager = LoginManager()
 
 @login_manager.user_loader
 def load_user(user_id):
-    pass
+    from albumy.models import User
+    user = User.query.get(int(user_id))
+    return user
+
+
+login_manager.login_view = 'auth.login'
+login_manager.login_message_category = 'warning'
+login_manager.refresh_view = ''
+login_manager.needs_refresh_message_category = 'warning'

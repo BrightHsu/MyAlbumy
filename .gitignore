@@ -5,3 +5,4 @@ PIPENV_VENV_IN_PROJECT/
 *.db
 
 !.gitkeep
+*.py

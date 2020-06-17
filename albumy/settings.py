@@ -44,6 +44,8 @@ class BaseConfig:
 
     ALLOWED_IMAGE_EXTENSIONS = ['png', 'jpg', 'jpeg', 'gif']
 
+    ALBUMY_MAIL_SUBJECT_PREFIX = '[Albumy]'
+
 
 class DevelopmentConfig(BaseConfig):
     SQLALCHEMY_DATABASE_URI = prefix + os.path.join(basedir, 'data-dev.db')

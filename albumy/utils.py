@@ -11,9 +11,14 @@
 
 
 from flask import redirect, url_for, request
-from urllib.parse import urljoin, urlparse
 from flask import current_app
+
+from urllib.parse import urljoin, urlparse
+
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
+from itsdangerous import BadSignature, SignatureExpired
+
+from albumy.extensions import db
 from albumy.settings import Operations
 
 
@@ -36,12 +41,31 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in current_app.config['ALLOWED_IMAGE_EXTENSIONS']
 
 
+# 生成验证令牌
 def generate_token(user, operation, expire_in=None, **kwargs):
-    s = Serializer(current_app.config['SECRET_KEY'], expire_in)
+    # expire_in 参数用来设置过期时间，默认3600s
+    s = Serializer(current_app.config['SECRET_KEY'], expire_in)  # 令牌序列化对象
     data = {'id': user.id, 'operation': operation}
     data.update(**kwargs)
     return s.dumps(data)
 
 
-def validate_token():
-    pass
+# 验证令牌
+def validate_token(user, token, operation):
+    s = Serializer(current_app.config['SECRET_KEY'])
+
+    try:
+        data = s.load(token)
+    except (SignatureExpired, BadSignature):
+        return False
+
+    if operation != data.get('operation') or user.id != data.get('id'):
+        return False
+
+    if operation == Operations.CONFIRM:
+        user.confirmed = True
+    else:
+        return False
+
+    db.session.commit()
+    return True

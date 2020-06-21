@@ -51,19 +51,29 @@ def generate_token(user, operation, expire_in=None, **kwargs):
 
 
 # 验证令牌
-def validate_token(user, token, operation):
+def validate_token(user, token, operation, new_password=None):
     s = Serializer(current_app.config['SECRET_KEY'])
 
     try:
+        # 加载 令牌
         data = s.load(token)
+
     except (SignatureExpired, BadSignature):
+        # 会抛出SignatureExpired异常或BadSignature异常，
+        # 这两个异常分别表示签名过期和签名不匹配
         return False
 
     if operation != data.get('operation') or user.id != data.get('id'):
+        # 验证数据中存储的operation值是否和传入的operation参数匹配
+        # 用户id值与当前用户的id是否相同
         return False
 
     if operation == Operations.CONFIRM:
         user.confirmed = True
+
+    elif operation == Operations.RESET_PASSWORD:
+        user.set_password(new_password)  # 设置新密码
+
     else:
         return False
 

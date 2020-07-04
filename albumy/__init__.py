@@ -14,7 +14,7 @@ from flask import Flask
 import os
 import click
 from albumy.settings import config
-from albumy.extensions import db, mail, moment, login_manager, bootstrap, csrf
+from albumy.extensions import db, mail, moment, login_manager, bootstrap, csrf, dropzone, avatars
 from albumy.blueprints.admin import admin_bp
 from albumy.blueprints.ajax import ajax_bp
 from albumy.blueprints.auth import auth_bp
@@ -47,7 +47,8 @@ def register_extensions(app):
     login_manager.init_app(app)
     bootstrap.init_app(app)
     csrf.init_app(app)
-
+    dropzone.init_app(app)
+    avatars.init_app(app)
 
 def register_blueprints(app):
     app.register_blueprint(main_bp)
@@ -99,3 +100,15 @@ def register_commands(app):
             click.echo('Drop tables.')
         db.create_all()
         click.echo('Initialized database.')
+
+    @app.cli.command()
+    def init():
+        from albumy.models import Role
+        """Initialize Albumy."""
+        click.echo('Initializing the database...')
+        db.create_all()
+
+        click.echo('Initializing the roles and permissions...')
+        Role.init_role()
+
+        click.echo('Done')

@@ -17,6 +17,8 @@ flask-sqlalchemy = "*"
 bootstrap-flask = "*"
 email-validator = "*"
 pillow = "*"
+flask-dropzone = "*"
+flask-avatars = "*"
 
 [requires]
 python_version = "3.7"

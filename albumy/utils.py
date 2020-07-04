@@ -20,7 +20,9 @@ from itsdangerous import BadSignature, SignatureExpired
 
 from albumy.extensions import db
 from albumy.settings import Operations
-
+import os
+import uuid
+from PIL import Image
 
 def is_safe_url(target):
     ref_url = urlparse(request.host_url)
@@ -79,3 +81,27 @@ def validate_token(user, token, operation, new_password=None):
 
     db.session.commit()
     return True
+
+
+# 重命名文件名
+def rename_image(old_filename):
+    ext = os.path.splitext(old_filename)[1]
+    new_filename = uuid.uuid4().hex + ext
+    return new_filename
+
+
+# 裁切图片尺寸
+def resize_image(image, filename, base_width):
+    filename, ext = os.path.splitext(filename)
+    img = Image.open(image)
+    """:type:Image.Image"""
+    if img.size[0] <= base_width:
+        return filename + ext
+    w_percent = (base_width/float(img.size[0]))
+    h_size = int(float(img.size[1]) * float(w_percent))
+    img = img.resize((base_width, h_size), Image.ANTIALIAS)
+
+    filename += current_app.config['ALBUMY_PHOTO_SUFFIX'][base_width] + ext
+
+    img.save(os.path.join(current_app.config['ALBUMY_UPLOAD_PATH'], filename), optimize=True, quality=85)
+    return filename
